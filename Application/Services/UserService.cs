@@ -33,18 +33,6 @@ public class UserService
         return _mapper.Map<User, UserDTO>(user);
     }
 
-    public async Task<IEnumerable<IUser>> GetAll()
-    {
-        var User = await _userRepository.GetAllAsync();
-        return User;
-    }
-
-    public async Task<IUser?> GetById(Guid Id)
-    {
-        var User = await _userRepository.GetByIdAsync(Id);
-        return User;
-    }
-
     public async Task<UserDTO?> UpdateActivation(Guid Id, ActivationDTO activationDTO)
     {
 
@@ -56,11 +44,6 @@ public class UserService
             await _userRepository.SaveChangesAsync();
         }
         return _mapper.Map<User, UserDTO>(User);
-    }
-
-    public async Task<bool> Exists(Guid Id)
-    {
-        return await _userRepository.Exists(Id);
     }
 
     public async Task CreateAsync(Guid id, string names, string surnames, string email, PeriodDateTime periodDateTime)
