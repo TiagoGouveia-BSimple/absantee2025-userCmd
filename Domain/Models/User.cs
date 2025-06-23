@@ -20,8 +20,8 @@ public class User : IUser
 
         deactivationDate ??= DateTime.MaxValue;
 
-        if (DateTime.Now >= deactivationDate)
-            throw new ArgumentException("Deactivaton date can't be in the past.");
+        //if (DateTime.Now >= deactivationDate)
+        //    throw new ArgumentException("Deactivaton date can't be in the past.");
 
         Id = Guid.NewGuid();
         Names = names;

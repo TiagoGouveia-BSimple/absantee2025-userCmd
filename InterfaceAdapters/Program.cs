@@ -53,7 +53,10 @@ builder.Services.AddMassTransit(x =>
             h.Password("guest");
         });
 
-        cfg.ConfigureEndpoints(context);
+        cfg.ReceiveEndpoint("userCreatedCmd", conf =>
+        {
+            conf.ConfigureConsumer<UserCreatedConsumer>(context);
+        });
     });
 });
 
