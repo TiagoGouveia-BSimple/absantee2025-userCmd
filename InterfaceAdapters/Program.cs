@@ -8,6 +8,8 @@ using Infrastructure.Repositories;
 using Infrastructure.Resolvers;
 using Microsoft.EntityFrameworkCore;
 using MassTransit;
+using InterfaceAdapters.Publishers;
+using Application.IPublishers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +22,7 @@ builder.Services.AddDbContext<AbsanteeContext>(opt =>
     );
 
 //Services
-builder.Services.AddTransient<UserService>();
+builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddScoped<IMessagePublisher, MassTransitPublisher>();
 
 //Repositories

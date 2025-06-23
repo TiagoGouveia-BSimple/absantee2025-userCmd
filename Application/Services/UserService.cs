@@ -1,4 +1,5 @@
 using Application.DTO;
+using Application.IPublishers;
 using AutoMapper;
 using Domain.Factory;
 using Domain.Interfaces;
@@ -7,7 +8,8 @@ using Domain.Models;
 using Infrastructure.DataModel;
 namespace Application.Services;
 
-public class UserService
+
+public class UserService : IUserService
 {
     private IUserRepository _userRepository;
     private IUserFactory _userFactory;
@@ -29,7 +31,7 @@ public class UserService
         await _userRepository.SaveChangesAsync();
 
         await _publisher.PublishCreatedUserMessageAsync(user.Id, user.Names, user.Surnames, user.Email, user.PeriodDateTime);
-x
+
         return _mapper.Map<User, UserDTO>(user);
     }
 
@@ -65,7 +67,7 @@ x
 
     public async Task AddConsumed(Guid id, string names, string surnames, string email, PeriodDateTime periodDateTime)
     {
-        if(await Exists(id)) return;
+        if (await Exists(id)) return;
 
         var visitor = new UserDataModel()
         {

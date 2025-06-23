@@ -1,6 +1,9 @@
 using Domain.Models;
 using Domain.Messages;
 using MassTransit;
+using Application.IPublishers;
+
+namespace InterfaceAdapters.Publishers;
 
 public class MassTransitPublisher : IMessagePublisher
 {
