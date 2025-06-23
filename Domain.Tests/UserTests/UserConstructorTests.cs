@@ -22,10 +22,10 @@ public class UserConstructorTests
 
     public static IEnumerable<object[]> GetUserData_InvalidFirstNamesAndLastNames()
     {
-        yield return new object[] { new string('a', 51), "Doe", "john@email.com", DateTime.Now.AddDays(1) };
+        yield return new object[] { new string('a', 51), "Doe", "john@email.com", DateTime.UtcNow.AddDays(1) };
         yield return new object[] { "", "Doe", "john@email.com", DateTime.Now.AddDays(1) };
         yield return new object[] { "John 13", "Doe", "john@email.com", null! };
-        yield return new object[] { "John", new string('a', 51), "john@email.com", DateTime.Now.AddDays(1) };
+        yield return new object[] { "John", new string('a', 51), "john@email.com", DateTime.UtcNow.AddDays(1) };
         yield return new object[] { "John", "Doe 13", "john@email.com", null! };
     }
 
@@ -55,7 +55,7 @@ public class UserConstructorTests
             // Act
             new User(firstName, lastName, email, deactivationDate));
 
-        Assert.Equal("Deactivaton date can't be in the past.", exception.Message);
+        Assert.Equal("Invalid Arguments", exception.Message);
     }
 
     [Theory]
