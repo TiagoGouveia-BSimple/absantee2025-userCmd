@@ -9,9 +9,9 @@ namespace InterfaceAdapters.Controllers;
 [ApiController]
 public class UserController : ControllerBase
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
     List<string> _errorMessages = new List<string>();
-    public UserController(UserService userService)
+    public UserController(IUserService userService)
     {
         _userService = userService;
     }

@@ -67,6 +67,9 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddSwaggerGen();
 
+// read env variables for connection string
+builder.Configuration.AddEnvironmentVariables();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -89,6 +92,12 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AbsanteeContext>();
+    dbContext.Database.Migrate();
+}
 
 app.Run();
 
