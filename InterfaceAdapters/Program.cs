@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using MassTransit;
 using InterfaceAdapters.Publishers;
 using Application.IPublishers;
+using InterfaceAdapters.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +47,8 @@ builder.Services.AddAutoMapper(cfg =>
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<UserCreatedConsumer>();
+    x.AddConsumer<CreateUserConsumer>();
+
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -58,6 +61,11 @@ builder.Services.AddMassTransit(x =>
         cfg.ReceiveEndpoint("userCreatedCmd", conf =>
         {
             conf.ConfigureConsumer<UserCreatedConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("user-for-collab", e => 
+        {
+            e.ConfigureConsumer<CreateUserConsumer>(context); 
         });
     });
 });

@@ -1,3 +1,4 @@
+using Domain.Contracts;
 using Domain.Models;
 
 namespace Application.IPublishers;

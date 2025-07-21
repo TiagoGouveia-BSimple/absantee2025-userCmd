@@ -1,11 +1,13 @@
 using Application.DTO;
 using Application.IPublishers;
 using AutoMapper;
+using Domain.Contracts;
 using Domain.Factory;
 using Domain.Interfaces;
 using Domain.IRepository;
 using Domain.Models;
 using Infrastructure.DataModel;
+using Microsoft.EntityFrameworkCore.Update.Internal;
 namespace Application.Services;
 
 
@@ -82,5 +84,21 @@ public class UserService : IUserService
 
         await _userRepository.AddAsync(user);
         await _userRepository.SaveChangesAsync();
+    }
+
+    public async Task<IUser> CreateSagaUserAsync(string names, string surnames, string email, DateTime? deactivationDate)
+    {
+        if (await _userRepository.GetByEmailAsync(email) != null)
+        {
+            throw new ArgumentException($"O email '{email}' já está em uso.");
+        }
+
+        var user = await _userFactory.Create(names, surnames, email, deactivationDate ?? DateTime.MaxValue);
+        await _userRepository.AddAsync(user);
+        await _userRepository.SaveChangesAsync();
+
+        await _publisher.PublishCreatedUserMessageAsync(user.Id, user.Names, user.Surnames, user.Email, user.PeriodDateTime);
+
+        return user; 
     }
 }
