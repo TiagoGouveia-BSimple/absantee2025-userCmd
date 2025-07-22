@@ -1,3 +1,4 @@
+using Application.IService;
 using Application.Services;
 using Domain.Messages;
 using MassTransit;

@@ -1,4 +1,5 @@
 using Application.DTO;
+using Application.IService;
 using Application.Services;
 using Domain.Interfaces;
 using Domain.Models;
@@ -18,12 +19,19 @@ public class UserController : ControllerBase
 
     // Post: api/users
     [HttpPost]
-    public async Task<ActionResult<UserDTO>> PostUsers(UserDTO userDTO)
+    public async Task<ActionResult<UserDTO>> PostUsers(CreateUserDTO userDTO)
     {
+        var userDTOResult = await _userService.Add(userDTO);
+        var result = new UserDTO
         {
-            var userDTOResult = await _userService.Add(userDTO);
-            return Ok(userDTOResult);
-        }
+            Id = userDTOResult.Id,
+            Names = userDTOResult.Names,
+            Surnames = userDTOResult.Surnames,
+            Email = userDTOResult.Email,
+            Period = userDTOResult.Period
+        };
+        
+        return Ok(userDTOResult);
     }
 
     // Patch: api/users/id/activation

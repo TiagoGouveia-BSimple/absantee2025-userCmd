@@ -1,13 +1,12 @@
 using Application.DTO;
 using Application.IPublishers;
+using Application.IService;
 using AutoMapper;
-using Domain.Contracts;
 using Domain.Factory;
 using Domain.Interfaces;
 using Domain.IRepository;
 using Domain.Models;
 using Infrastructure.DataModel;
-using Microsoft.EntityFrameworkCore.Update.Internal;
 namespace Application.Services;
 
 
@@ -16,17 +15,15 @@ public class UserService : IUserService
     private IUserRepository _userRepository;
     private IUserFactory _userFactory;
     private readonly IMessagePublisher _publisher;
-    private readonly IMapper _mapper;
 
-    public UserService(IUserRepository userRepository, IUserFactory userFactory, IMapper mapper, IMessagePublisher publisher)
+    public UserService(IUserRepository userRepository, IUserFactory userFactory, IMessagePublisher publisher)
     {
         _userRepository = userRepository;
         _userFactory = userFactory;
-        _mapper = mapper;
         _publisher = publisher;
     }
 
-    public async Task<UserDTO> Add(UserDTO userDTO)
+    public async Task<CreatedUserDTO> Add(CreateUserDTO userDTO)
     {
         var user = await _userFactory.Create(userDTO.Names, userDTO.Surnames, userDTO.Email, userDTO.FinalDate);
         await _userRepository.AddAsync(user);
@@ -34,19 +31,36 @@ public class UserService : IUserService
 
         await _publisher.PublishCreatedUserMessageAsync(user.Id, user.Names, user.Surnames, user.Email, user.PeriodDateTime);
 
-        return _mapper.Map<User, UserDTO>(user);
+        return new CreatedUserDTO(user.Id, user.Names, user.Surnames, user.Email, user.PeriodDateTime);
     }
 
-    public async Task<IEnumerable<IUser>> GetAll()
+    public async Task<IEnumerable<UserDTO>> GetAll()
     {
         var User = await _userRepository.GetAllAsync();
-        return User;
+        return User.Select(u => new UserDTO
+        {
+            Id = u.Id,
+            Names = u.Names,
+            Surnames = u.Surnames,
+            Email = u.Email,
+            Period = u.PeriodDateTime
+        });
     }
 
-    public async Task<IUser?> GetById(Guid Id)
+    public async Task<UserDTO?> GetById(Guid Id)
     {
         var User = await _userRepository.GetByIdAsync(Id);
-        return User;
+
+        if (User == null) return null;
+
+        return new UserDTO
+        {
+            Id = User.Id,
+            Names = User.Names,
+            Surnames = User.Surnames,
+            Email = User.Email,
+            Period = User.PeriodDateTime
+        };
     }
 
     public async Task<UserDTO?> UpdateActivation(Guid Id, ActivationDTO activationDTO)
@@ -58,8 +72,17 @@ public class UserService : IUserService
         {
             await _userRepository.ActivationUser(Id, activationDTO.FinalDate);
             await _userRepository.SaveChangesAsync();
+            return new UserDTO
+            {
+                Id = User.Id,
+                Names = User.Names,
+                Surnames = User.Surnames,
+                Email = User.Email,
+                Period = User.PeriodDateTime
+            };
         }
-        return _mapper.Map<User, UserDTO>(User);
+
+        return null;
     }
 
     public async Task<bool> Exists(Guid Id)

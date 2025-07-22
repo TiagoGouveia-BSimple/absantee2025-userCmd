@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Domain.Interfaces;
 using Domain.IRepository;
 using Domain.Models;
 using Domain.Visitor;
@@ -15,7 +16,7 @@ public class UserFactory : IUserFactory
         _userRepository = userRepository;
     }
 
-    public async Task<User> Create(string names, string surnames, string email, DateTime deactivationDate)
+    public async Task<IUser> Create(string names, string surnames, string email, DateTime deactivationDate)
     {
         var existingUser = await _userRepository.GetByEmailAsync(email);
 
@@ -27,7 +28,7 @@ public class UserFactory : IUserFactory
         return new User(names, surnames, email, deactivationDate);
     }
 
-    public User Create(IUserVisitor userVisitor)
+    public IUser Create(IUserVisitor userVisitor)
     {
         return new User(userVisitor.Id, userVisitor.Names, userVisitor.Surnames, userVisitor.Email, userVisitor.PeriodDateTime);
     }

@@ -80,7 +80,7 @@ public class UserRepositoryEF : GenericRepositoryEF<IUser, User, UserDataModel>,
         if (userDM == null)
             return null;
 
-        var user = _mapper.Map<UserDataModel, User>(userDM);
+        var user = _mapper.Map<UserDataModel, IUser>(userDM);
         return user;
     }
 
@@ -91,7 +91,7 @@ public class UserRepositoryEF : GenericRepositoryEF<IUser, User, UserDataModel>,
         if (userDM == null)
             return null;
 
-        var user = _mapper.Map<UserDataModel, User>(userDM);
+        var user = _mapper.Map<UserDataModel, IUser>(userDM);
         return user;
     }
 
@@ -101,7 +101,7 @@ public class UserRepositoryEF : GenericRepositoryEF<IUser, User, UserDataModel>,
             .Where(u => userIdsOfCollab.Contains(u.Id))
             .ToListAsync();
 
-        return usersDM.Select(u => _mapper.Map<User>(u));
+        return usersDM.Select(u => _mapper.Map<IUser>(u));
     }
 
     public async Task<bool> Exists(Guid ID)
@@ -121,9 +121,8 @@ public class UserRepositoryEF : GenericRepositoryEF<IUser, User, UserDataModel>,
         _context.Entry(userDataModel).State = EntityState.Modified;
 
         await _context.SaveChangesAsync();
-        var user = _mapper.Map<UserDataModel, User>(userDataModel);
+        var user = _mapper.Map<UserDataModel, IUser>(userDataModel);
         return user;
-
     }
 
     public async Task<IUser?> UpdateUser(IUser user)
@@ -138,6 +137,6 @@ public class UserRepositoryEF : GenericRepositoryEF<IUser, User, UserDataModel>,
         userDM.PeriodDateTime = user.PeriodDateTime;
 
         _context.Set<UserDataModel>().Update(userDM);
-        return _mapper.Map<UserDataModel, User>(userDM);
+        return _mapper.Map<UserDataModel, IUser>(userDM);
     }
 }

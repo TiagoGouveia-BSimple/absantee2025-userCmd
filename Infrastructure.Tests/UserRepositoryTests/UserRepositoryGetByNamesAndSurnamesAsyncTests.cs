@@ -1,27 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Domain.Interfaces;
-using Domain.Visitor;
-using Infrastructure.DataModel;
 using AutoMapper;
-using Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Moq;
-using Xunit;
-using Domain.Models;
 using Domain.Factory;
+using Domain.Interfaces;
+using Domain.Models;
+using Infrastructure.DataModel;
+using Infrastructure.Repositories;
 using Infrastructure.Resolvers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Moq;
 
 namespace Infrastructure.Tests.UserRepositoryTests;
-public class UserRepositoryGetBySurnamesAsyncTests
-{
+
+public class UserRepositoryGetByNamesAndSurnamesAsyncTests {
     [Theory]
-    [InlineData("Silva", "Silvana", 2)]
-    [InlineData("Silva", "Gomes", 1)]
-    [InlineData("Gomes", "Pereira", 0)]
-    public async Task WhenGettingBySurnamesAsync_ShouldReturnCorrectUsers(string surname1, string surname2, int expectedCount)
+    [InlineData("John", "Silva", "Johnny", "Silvana", 2)]
+    [InlineData("Johnny", "Silva", "Pedro", "Gomes",  1)]
+    [InlineData("Morgan", "Gomes",  "Pedro", "Pereira",  0)]
+    public async Task WhenGettingByNamesAndSurnamesAsync_ShouldReturnCorrectUsers(string name1, string surname1, string name2, string surname2, int expectedCount)
     {
         // Arrange
         var options = new DbContextOptionsBuilder<AbsanteeContext>()
@@ -34,7 +29,7 @@ public class UserRepositoryGetBySurnamesAsyncTests
         var user1 = new UserDataModel
         {
             Id = id1,
-            Names = "John",
+            Names = name1,
             Surnames = surname1,
             Email = "user1@gmail.com"
         };
@@ -43,7 +38,7 @@ public class UserRepositoryGetBySurnamesAsyncTests
         var user2 = new UserDataModel
         {
             Id = id2,
-            Names = "Johnny",
+            Names = name2,
             Surnames = surname2,
             Email = "user2@gmail.com"
         };
@@ -51,16 +46,15 @@ public class UserRepositoryGetBySurnamesAsyncTests
         var userMock = new Mock<IUser>();
         userMock.Setup(u => u.Id).Returns(user1.Id);
         userMock.Setup(u => u.Names).Returns(user1.Names);
-        userMock.Setup(u => u.Surnames).Returns(user1.Surnames);
 
         context.Users.AddRange(user1, user2);
         await context.SaveChangesAsync();
 
         var userFactoryMock = new Mock<IUserFactory>();
         userFactoryMock.Setup(f => f.Create(user1)).Returns(
-            userMock.Object);
+            new User(user1.Id, user1.Names, user1.Surnames, user1.Email, user1.PeriodDateTime));
         userFactoryMock.Setup(f => f.Create(user2)).Returns(
-            userMock.Object);
+            new User(user2.Id, user2.Names, user2.Surnames, user2.Email, user2.PeriodDateTime));
 
         var converter = new UserDataModelConverter(userFactoryMock.Object);
 
@@ -74,14 +68,19 @@ public class UserRepositoryGetBySurnamesAsyncTests
         var userRepository = new UserRepositoryEF(context, mapper);
 
         // Act
-        var result = await userRepository.GetBySurnamesAsync("Silva");
+        var result = await userRepository.GetByNamesAndSurnamesAsync("John", "Silva");
 
         // Assert
         Assert.Equal(expectedCount, result.Count());
         var users = result.Select(id => userRepository.GetById(id));
         if (expectedCount > 0)
         {
-            Assert.All(users, u => Assert.Contains("Silva", u.Surnames, StringComparison.OrdinalIgnoreCase));
+            Assert.All(users, u =>
+            {
+                Assert.Contains("John", u.Names, StringComparison.OrdinalIgnoreCase);
+                Assert.Contains("Silva", u.Surnames, StringComparison.OrdinalIgnoreCase);
+            
+            });
         }
         else
         {
@@ -89,4 +88,3 @@ public class UserRepositoryGetBySurnamesAsyncTests
         }
     }
 }
-

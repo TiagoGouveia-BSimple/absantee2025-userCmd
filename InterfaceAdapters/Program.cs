@@ -11,6 +11,7 @@ using MassTransit;
 using InterfaceAdapters.Publishers;
 using Application.IPublishers;
 using InterfaceAdapters.Consumers;
+using Application.IService;
 
 var builder = WebApplication.CreateBuilder(args);
 

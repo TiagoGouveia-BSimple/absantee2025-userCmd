@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Domain.Models;
+using Domain.Interfaces;
 using Infrastructure.DataModel;
 using Infrastructure.Resolvers;
 
@@ -9,8 +9,8 @@ public class DataModelMappingProfile : Profile
 {
     public DataModelMappingProfile()
     {
-        CreateMap<User, UserDataModel>();
-        CreateMap<UserDataModel, User>()
+        CreateMap<IUser, UserDataModel>();
+        CreateMap<UserDataModel, IUser>()
             .ConvertUsing<UserDataModelConverter>();
     }
 
