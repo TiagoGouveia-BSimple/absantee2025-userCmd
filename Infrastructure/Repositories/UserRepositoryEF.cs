@@ -135,8 +135,9 @@ public class UserRepositoryEF : GenericRepositoryEF<IUser, User, UserDataModel>,
         userDM.Surnames = user.Surnames;
         userDM.Email = user.Email;
         userDM.PeriodDateTime = user.PeriodDateTime;
+        _context.Entry(userDM).State = EntityState.Modified;
 
-        _context.Set<UserDataModel>().Update(userDM);
+        await _context.SaveChangesAsync();
         return _mapper.Map<UserDataModel, IUser>(userDM);
     }
 }

@@ -99,7 +99,6 @@ public class UserService : IUserService
         var User = _userFactory.Create(visitor);
 
         await _userRepository.UpdateUser(User);
-        await _userRepository.SaveChangesAsync();
 
         await _publisher.PublishUpdatedUserMessageAsync(User.Id, User.Names, User.Surnames, User.Email, User.PeriodDateTime);
 
@@ -127,7 +126,6 @@ public class UserService : IUserService
         var User = _userFactory.Create(visitor);
 
         await _userRepository.UpdateUser(User);
-        await _userRepository.SaveChangesAsync();
     }
 
     public async Task<bool> Exists(Guid Id)
