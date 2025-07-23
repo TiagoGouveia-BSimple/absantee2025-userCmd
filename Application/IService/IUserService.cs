@@ -13,5 +13,7 @@ public interface IUserService
     Task<UserDTO?> GetById(Guid Id);
     Task<UserDTO?> UpdateActivation(Guid Id, ActivationDTO activationDTO);
     Task<UserDTO> UpdateUser(UserDTO userDTO);
+    Task<UserDTO> UpdateUserConsumed(Guid id, string names, string surnames, string email, PeriodDateTime periodDateTime);
+
     Task<IUser> CreateSagaUserAsync(string names, string surnames, string email, DateTime? deactivationDate);
 }

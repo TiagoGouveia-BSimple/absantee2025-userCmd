@@ -87,10 +87,22 @@ public class UserService : IUserService
 
     public async Task<UserDTO> UpdateUser(UserDTO userDTO)
     {
-        var User = (User?)await _userRepository.GetByIdAsync(userDTO.Id);
+        var visitor = new UserDataModel()
+        {
+            Id = userDTO.Id,
+            Names = userDTO.Names,
+            Surnames = userDTO.Surnames,
+            Email = userDTO.Email,
+            PeriodDateTime = userDTO.Period
+        };
+
+        var User = _userFactory.Create(visitor);
 
         await _userRepository.UpdateUser(User);
         await _userRepository.SaveChangesAsync();
+
+        await _publisher.PublishUpdatedUserMessageAsync(User.Id, User.Names, User.Surnames, User.Email, User.PeriodDateTime);
+
         return new UserDTO
         {
             Id = User.Id,
@@ -99,6 +111,23 @@ public class UserService : IUserService
             Email = User.Email,
             Period = User.PeriodDateTime
         };
+    }
+
+    public async Task UpdateUserConsumed(Guid id, string names, string surnames, string email, PeriodDateTime periodDateTime)
+    {
+        var visitor = new UserDataModel()
+        {
+            Id = id,
+            Names = names,
+            Surnames = surnames,
+            Email = email,
+            PeriodDateTime = periodDateTime
+        };
+
+        var User = _userFactory.Create(visitor);
+
+        await _userRepository.UpdateUser(User);
+        await _userRepository.SaveChangesAsync();
     }
 
     public async Task<bool> Exists(Guid Id)
