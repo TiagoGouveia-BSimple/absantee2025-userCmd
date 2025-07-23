@@ -34,6 +34,21 @@ public class UserController : ControllerBase
         return Ok(userDTOResult);
     }
 
+    [HttpPatch("{id}")]
+    public async Task<ActionResult<UserDTO>> UpdateUser(UpdateUserDTO updaterUserDTO)
+    {
+        var result = await _userService.UpdateUser(new UserDTO
+        {
+            Id = updaterUserDTO.Id,
+            Names = updaterUserDTO.Names,
+            Surnames = updaterUserDTO.Surnames,
+            Email = updaterUserDTO.Email,
+            Period = updaterUserDTO.Period
+        });
+
+        return Ok(result);
+    }
+
     // Patch: api/users/id/activation
     [HttpPatch("{id}/updateactivation")]
     public async Task<ActionResult<UserDTO>> UpdateActivation(Guid id, [FromBody] ActivationDTO activationPeriodDTO)
